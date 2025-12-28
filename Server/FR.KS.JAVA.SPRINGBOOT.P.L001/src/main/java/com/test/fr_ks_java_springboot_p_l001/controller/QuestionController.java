@@ -1,0 +1,168 @@
+package com.test.fr_ks_java_springboot_p_l001.controller;
+
+import com.test.fr_ks_java_springboot_p_l001.dto.ApiResponse;
+import com.test.fr_ks_java_springboot_p_l001.dto.PageResponseDTO;
+import com.test.fr_ks_java_springboot_p_l001.dto.question.questionRequest;
+import com.test.fr_ks_java_springboot_p_l001.dto.question.questionResponse;
+import com.test.fr_ks_java_springboot_p_l001.service.questionService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
+import org.springdoc.core.annotations.ParameterObject;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.UUID;
+
+@Tag(name = "Questions", description = "Question management APIs - Create questions with answers, manage question bank (Admin CRUD, Public Read)")
+@RestController
+@RequestMapping("/api/v1/questions")
+@RequiredArgsConstructor
+public class QuestionController {
+
+    private final questionService questionService;
+
+    @Operation(
+            summary = "Create new question",
+            description = "Create a question with answer choices. Questions are independent - assign to quizzes via Quiz API endpoints."
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "201",
+                    description = "Question created successfully",
+                    content = @Content(schema = @Schema(implementation = questionResponse.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "Access denied - Requires ADMIN role",
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "400",
+                    description = "Validation error",
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            )
+    })
+    @PostMapping
+    public ResponseEntity<ApiResponse<questionResponse>> create(
+            @Parameter(description = "Question details with answer choices", required = true)
+            @Valid @RequestBody questionRequest req) {
+        questionResponse data = questionService.create(req);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.created(data, "Question created successfully"));
+    }
+
+
+    @Operation(
+            summary = "Get all questions",
+            description = "Retrieve paginated list of questions with pagination and sorting support"
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "Questions retrieved successfully",
+                    content = @Content(schema = @Schema(implementation = PageResponseDTO.class))
+            )
+    })
+    @GetMapping
+    public ResponseEntity<ApiResponse<PageResponseDTO<questionResponse>>> getAll(
+            @Parameter(description = "Pagination parameters (page, size, sort)", example = "page=0&size=10&sort=createdAt,desc")
+            @ParameterObject Pageable pageable
+    ) {
+        PageResponseDTO<questionResponse> data = questionService.getAll(pageable);
+        return ResponseEntity.ok(ApiResponse.success(data, "Questions retrieved successfully"));
+    }
+
+    @Operation(
+            summary = "Get question by ID",
+            description = "Retrieve detailed information about a specific question including answers and associated quizzes"
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "Question found",
+                    content = @Content(schema = @Schema(implementation = questionResponse.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "Question not found",
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            )
+    })
+    @GetMapping("/{id}")
+    public ResponseEntity<ApiResponse<questionResponse>> getById(
+            @Parameter(description = "Question ID", required = true, example = "123e4567-e89b-12d3-a456-426614174000")
+            @PathVariable UUID id) {
+        questionResponse data = questionService.getById(id);
+        return ResponseEntity.ok(ApiResponse.success(data, "Question found"));
+    }
+
+    @Operation(
+            summary = "Update question",
+            description = "Update question content, type, score, and answer choices. Does not affect quiz assignments."
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "Question updated successfully",
+                    content = @Content(schema = @Schema(implementation = questionResponse.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "Question not found",
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "Access denied - Requires ADMIN role",
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            )
+    })
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<questionResponse>> update(
+            @Parameter(description = "Question ID", required = true)
+            @PathVariable UUID id,
+            @Parameter(description = "Updated question details", required = true)
+            @Valid @RequestBody questionRequest req) {
+        questionResponse data = questionService.update(id, req);
+        return ResponseEntity.ok(ApiResponse.success(data, "Question updated successfully"));
+    }
+
+    @Operation(
+            summary = "Delete question",
+            description = "Soft delete a question. Also removes question from all quizzes (cascade delete in join table)."
+    )
+    @ApiResponses(value = {
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "200",
+                    description = "Question deleted successfully"
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "404",
+                    description = "Question not found",
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            ),
+            @io.swagger.v3.oas.annotations.responses.ApiResponse(
+                    responseCode = "403",
+                    description = "Access denied - Requires ADMIN role",
+                    content = @Content(schema = @Schema(implementation = ApiResponse.class))
+            )
+    })
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> delete(
+            @Parameter(description = "Question ID", required = true)
+            @PathVariable UUID id) {
+        questionService.delete(id);
+        return ResponseEntity.ok(ApiResponse.success(null, "Question deleted successfully"));
+    }
+}
