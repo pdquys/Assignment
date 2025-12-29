@@ -32,7 +32,6 @@ public class Question extends BaseEntity {
     @OneToMany(mappedBy = "question", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Answer> answers = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "quiz_id", foreignKey = @ForeignKey(name = "fk_question_quiz"))
-    private Quiz quiz;
+    @ManyToMany(mappedBy = "questions")
+    private List<Quiz> quiz = new ArrayList<>();
 }

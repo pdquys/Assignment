@@ -1,5 +1,6 @@
 package com.test.fr_ks_java_springboot_p_l001.dto.user;
 
+import com.test.fr_ks_java_springboot_p_l001.validation.StrongPassword;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import java.util.Set;
@@ -16,6 +17,7 @@ public record UserRequest(
         @Schema(description = "User password (min 8 characters)", example = "SecureP@ss123", minLength = 8)
         @NotBlank(message = "{validation.password.notblank}")
         @Size(min = 8, message = "{validation.password.size}")
+        @StrongPassword
         String password,
 
         @Schema(description = "User full name", example = "Nguyen Van A", maxLength = 100)

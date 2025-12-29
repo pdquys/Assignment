@@ -96,7 +96,8 @@ public class QuizServiceImpl implements QuizService{
         }
 
         for (Question q : questions) {
-            q.setQuiz(quiz);
+            quiz.getQuestions().add(q);
+            quizRepository.save(quiz);
         }
 
         questionRepository.saveAll(questions);

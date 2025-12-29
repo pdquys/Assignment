@@ -14,9 +14,8 @@ import java.util.UUID;
 @Repository
 public interface QuizRepository extends JpaRepository<Quiz, UUID>, JpaSpecificationExecutor<Quiz> {
 
-    // Lấy quiz kèm questions + answers (tránh N+1 khi submit hoặc view detail)
     @EntityGraph(attributePaths = {"questions", "questions.answers"})
-    Optional<Quiz> findWithQuestionsById(UUID id);
+    Optional<Quiz> findWithQuestionsAndAnswersById(UUID id);
 
     // list có thể không cần answers, tùy use-case
     @EntityGraph(attributePaths = {"questions"})

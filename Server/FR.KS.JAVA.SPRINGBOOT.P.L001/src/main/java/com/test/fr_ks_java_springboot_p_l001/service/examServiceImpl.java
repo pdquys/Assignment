@@ -32,7 +32,7 @@ public class examServiceImpl implements  examService {
                 .orElseThrow(() -> new NotFoundException("User not found: " + req.userId()));
 
         // ================= 2. Load Quiz (FIX N+1) =================
-        Quiz quiz = quizRepository.findWithQuestionsById(req.quizId())
+        Quiz quiz = quizRepository.findWithQuestionsAndAnswersById(req.quizId())
                 .orElseThrow(() -> new NotFoundException("Quiz not found: " + req.quizId()));
 
         List<Question> questions = quiz.getQuestions();

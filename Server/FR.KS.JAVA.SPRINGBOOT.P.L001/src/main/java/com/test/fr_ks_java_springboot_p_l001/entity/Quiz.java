@@ -27,7 +27,7 @@ public class Quiz extends BaseEntity {
     @Column(name = "duration_minutes", nullable = false)
     private Integer durationMinutes;
 
-    // Quiz -> Questions (Many)
-    @OneToMany(mappedBy = "quiz", cascade = CascadeType.ALL, orphanRemoval = false)
+    @ManyToMany
+    @JoinTable(name = "quiz_questions", joinColumns = @JoinColumn(name = "quiz_id"), inverseJoinColumns = @JoinColumn(name = "question_id"))
     private List<Question> questions = new ArrayList<>();
 }
