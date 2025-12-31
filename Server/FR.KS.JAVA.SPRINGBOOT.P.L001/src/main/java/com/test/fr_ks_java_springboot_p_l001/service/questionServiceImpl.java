@@ -2,6 +2,7 @@ package com.test.fr_ks_java_springboot_p_l001.service;
 
 import com.test.fr_ks_java_springboot_p_l001.dto.PageResponseDTO;
 import com.test.fr_ks_java_springboot_p_l001.dto.answer.answerRequest;
+import com.test.fr_ks_java_springboot_p_l001.dto.answer.answerResponse;
 import com.test.fr_ks_java_springboot_p_l001.dto.question.questionRequest;
 import com.test.fr_ks_java_springboot_p_l001.dto.question.questionResponse;
 import com.test.fr_ks_java_springboot_p_l001.entity.Answer;
@@ -100,13 +101,34 @@ public class questionServiceImpl implements questionService {
     }
 
     private questionResponse toRes(Question q) {
+        // map answers
+        List<answerResponse> answers = q.getAnswers()
+                .stream()
+                .map(a -> new answerResponse(
+                        a.getId(),
+                        a.getContent(),
+                        a.getIsCorrect()
+                ))
+                .toList();
+
+        // map quizzes (read-only)
+        List<questionResponse.QuizInfoDTO> quizzes = q.getQuiz()
+                .stream()
+                .map(quiz -> new questionResponse.QuizInfoDTO(
+                        quiz.getId(),
+                        quiz.getTitle()
+                ))
+                .toList();
+
         return new questionResponse(
                 q.getId(),
                 q.getContent(),
                 q.getType(),
                 q.getScore(),
                 q.getCreatedAt(),
-                q.getUpdatedAt()
+                q.getUpdatedAt(),
+                quizzes,
+                answers
         );
     }
 }

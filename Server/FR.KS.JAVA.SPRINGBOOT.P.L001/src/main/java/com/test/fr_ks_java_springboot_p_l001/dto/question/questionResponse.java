@@ -24,9 +24,20 @@ public record questionResponse(
 
         Instant createdAt,
 
-        Instant updatedAt
+        Instant updatedAt,
 
-//        @Schema(description = "List of answer choices")
-//        List<answerResponse> answers
+        @Schema(description = "List of quizzes using this question (read-only, managed via Quiz API)")
+                List<QuizInfoDTO> quizzes,
+
+        @Schema(description = "List of answer choices")
+        List<answerResponse> answers
 ) {
+        @Schema(description = "Quiz summary information")
+        public record QuizInfoDTO(
+                @Schema(description = "Quiz ID")
+                UUID id,
+                @Schema(description = "Quiz title", example = "Java Programming Basics")
+                String title
+        ) {}
 }
+

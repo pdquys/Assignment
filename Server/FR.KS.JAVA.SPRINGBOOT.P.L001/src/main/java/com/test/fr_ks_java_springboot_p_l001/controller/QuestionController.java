@@ -17,6 +17,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -50,6 +51,7 @@ public class QuestionController {
                     content = @Content(schema = @Schema(implementation = ApiResponse.class))
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ApiResponse<questionResponse>> create(
             @Parameter(description = "Question details with answer choices", required = true)
@@ -126,6 +128,7 @@ public class QuestionController {
                     content = @Content(schema = @Schema(implementation = ApiResponse.class))
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<questionResponse>> update(
             @Parameter(description = "Question ID", required = true)
@@ -156,6 +159,7 @@ public class QuestionController {
                     content = @Content(schema = @Schema(implementation = ApiResponse.class))
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(
             @Parameter(description = "Question ID", required = true)

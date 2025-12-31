@@ -51,6 +51,7 @@ public class QuizController {
                     content = @Content(schema = @Schema(implementation = ApiResponse.class))
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ApiResponse<QuizResponse>> create(
             @Valid @RequestBody QuizRequest req) {
@@ -123,6 +124,7 @@ public class QuizController {
                     content = @Content(schema = @Schema(implementation = ApiResponse.class))
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ApiResponse<QuizResponse>> update(
             @PathVariable UUID id,
@@ -152,6 +154,7 @@ public class QuizController {
                     content = @Content(schema = @Schema(implementation = ApiResponse.class))
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable UUID id) {
         quizService.delete(id);
@@ -159,7 +162,7 @@ public class QuizController {
     }
 
     @Operation(
-            summary = "Add single question to quiz",
+            summary = "Add question to quiz",
             description = "Add one question to a quiz. Question must already exist. Idempotent - won't add duplicates."
     )
     @ApiResponses(value = {
@@ -179,6 +182,7 @@ public class QuizController {
                     content = @Content(schema = @Schema(implementation = ApiResponse.class))
             )
     })
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/{id}/questions")
     public ResponseEntity<ApiResponse<Void>> addQuestions(
             @PathVariable UUID id,

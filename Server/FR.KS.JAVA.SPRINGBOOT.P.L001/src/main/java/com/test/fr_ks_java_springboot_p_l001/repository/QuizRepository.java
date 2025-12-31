@@ -22,4 +22,6 @@ public interface QuizRepository extends JpaRepository<Quiz, UUID>, JpaSpecificat
     Page<Quiz> findAllByActiveTrue(Pageable pageable);
 
     Optional<Quiz> findByIdAndActiveTrue(UUID id);
+
+    boolean existsByTitle(String title);
 }
